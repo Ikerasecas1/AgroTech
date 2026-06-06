@@ -1,0 +1,46 @@
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="page-title">
+      <mat-icon class="page-title-icon">dashboard</mat-icon>
+      Panel Principal
+    </h1>
+    <p class="page-subtitle">Vista general de tu explotación agrícola en tiempo real</p>
+  </div>
+
+  <!-- KPI Grid -->
+  <section class="kpi-grid" aria-label="Indicadores clave">
+    @for (kpi of kpiData(); track kpi.title) {
+      <app-kpi-card
+        [title]="kpi.title"
+        [value]="kpi.value"
+        [icon]="kpi.icon"
+        [trend]="kpi.trend ?? ''"
+        [accentColor]="kpi.accentColor ?? 'var(--ag-green-500)'"
+      />
+    }
+  </section>
+
+  <!-- Recent Activity -->
+  <section class="activity-section" aria-label="Actividad reciente">
+    <h2 class="section-title">
+      <mat-icon class="section-icon">history</mat-icon>
+      Actividad Reciente
+    </h2>
+
+    <div class="activity-list">
+      @for (activity of recentActivity(); track activity.title) {
+        <div class="activity-item">
+          <div class="activity-icon-wrapper" [style.background]="'color-mix(in srgb, ' + activity.iconColor + ' 15%, transparent)'">
+            <mat-icon class="activity-icon" [style.color]="activity.iconColor">{{ activity.icon }}</mat-icon>
+          </div>
+          <div class="activity-content">
+            <span class="activity-title">{{ activity.title }}</span>
+            <span class="activity-subtitle">{{ activity.subtitle }}</span>
+          </div>
+          <span class="activity-time">{{ activity.time }}</span>
+        </div>
+      }
+    </div>
+  </section>
+</div>

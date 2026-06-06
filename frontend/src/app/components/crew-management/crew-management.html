@@ -1,0 +1,128 @@
+<div class="crew-container">
+  <!-- Page Header with Connectivity Status -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <mat-icon class="page-title-icon">groups</mat-icon>
+        Gestión de Cuadrillas
+      </h1>
+      <p class="page-subtitle">Control horario de trabajadores</p>
+    </div>
+  </div>
+
+  <!-- KPI Grid -->
+  <section class="kpi-grid" aria-label="Indicadores de cuadrillas">
+    @for (kpi of kpiData(); track kpi.title) {
+      <app-kpi-card
+        [title]="kpi.title"
+        [value]="kpi.value"
+        [icon]="kpi.icon"
+        [trend]="kpi.trend ?? ''"
+        [accentColor]="kpi.accentColor ?? 'var(--ag-green-500)'"
+      />
+    }
+  </section>
+
+  <!-- Crews Panel -->
+  <section class="crews-section" aria-label="Cuadrillas activas">
+    <h2 class="section-title">
+      <mat-icon class="section-icon">diversity_3</mat-icon>
+      Cuadrillas Activas
+    </h2>
+    <div class="crews-grid">
+      @for (crew of crews(); track crew.name) {
+        <div class="crew-card" id="crew-card-{{ crews().indexOf(crew) }}">
+          <div class="crew-card-header">
+            <div class="crew-avatar" [style.background]="'color-mix(in srgb, ' + crew.accentColor + ' 20%, transparent)'" [style.border-color]="crew.accentColor">
+              <mat-icon [style.color]="crew.accentColor">groups</mat-icon>
+            </div>
+            <div class="crew-info">
+              <span class="crew-name">{{ crew.name }}</span>
+              <span class="crew-greenhouse">
+                <mat-icon class="inline-icon">warehouse</mat-icon>
+                {{ crew.greenhouse }}
+              </span>
+            </div>
+            <div class="crew-status-badge">
+              <div class="status-dot active"></div>
+              Activa
+            </div>
+          </div>
+          <div class="crew-card-body">
+            <div class="crew-stat">
+              <mat-icon class="stat-icon">person</mat-icon>
+              <span class="stat-label">Encargado:</span>
+              <span class="stat-value">{{ crew.foreman }}</span>
+            </div>
+            <div class="crew-stat">
+              <mat-icon class="stat-icon">group</mat-icon>
+              <span class="stat-label">Miembros:</span>
+              <span class="stat-value">{{ crew.memberCount }} jornaleros</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Time Records Table -->
+  <section class="table-section" aria-label="Control horario">
+    <div class="section-header-row">
+      <h2 class="section-title">
+        <mat-icon class="section-icon">schedule</mat-icon>
+        Control Horario del Día
+      </h2>
+
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table" id="time-records-table">
+        <thead>
+          <tr>
+            <th>Trabajador</th>
+            <th>Código QR</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Horas</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (record of timeRecords(); track record.qrCode) {
+            <tr class="table-row" [class.active-shift]="!record.checkOut">
+              <td class="worker-cell">
+                <div class="worker-avatar-sm">
+                  <mat-icon>person</mat-icon>
+                </div>
+                {{ record.workerName }}
+              </td>
+              <td>
+                <span class="qr-badge">
+                  <mat-icon class="qr-icon">qr_code_2</mat-icon>
+                  {{ record.qrCode }}
+                </span>
+              </td>
+              <td>
+                <span class="time-value">{{ record.checkIn }}</span>
+              </td>
+              <td>
+                @if (record.checkOut) {
+                  <span class="time-value">{{ record.checkOut }}</span>
+                } @else {
+                  <span class="time-value in-progress">
+                    <div class="pulse-dot"></div>
+                    Trabajando
+                  </span>
+                }
+              </td>
+              <td>
+                <span class="hours-value" [class.in-progress]="!record.checkOut">{{ record.hoursWorked }}</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+</div>

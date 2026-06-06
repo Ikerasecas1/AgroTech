@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroTech Dashboard - Prototipo</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --primary: #4caf50;
+            --primary-hover: #45a049;
+            --text: #ffffff;
+            --text-muted: #aaaaaa;
+            --border: #333333;
+            --warning: #ff9800;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h2 {
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        select:focus,
+        textarea:focus {
+            outline: 1px solid var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:disabled {
+            background-color: #555555;
+            cursor: not-allowed;
+        }
+
+        /* Estados de la IA */
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--warning);
+            font-style: italic;
+        }
+
+        .result-card {
+            display: none;
+            border-left: 4px solid var(--warning);
+        }
+
+        .result-card h3 {
+            margin-top: 0;
+            color: var(--warning);
+        }
+
+        .badge {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .treatment-text {
+            background-color: #252525;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid #3a3a3a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Cuaderno de Campo Inteligente 🌾</h2>
+        <p class="subtitle">Control de incidencias asistido por IA para invernaderos</p>
+
+        <!-- Formulario de Registro -->
+        <div class="card">
+            <div class="form-group">
+                <label for="cropSelect">Selecciona el Cultivo / Sector:</label>
+                <select id="cropSelect">
+                    <option value="" disabled selected>-- Elige una zona de Almería --</option>
+                    <option value="1">Invernadero Norte - Tomate Cherry</option>
+                    <option value="2">Invernadero Sur - Pimiento California</option>
+                    <option value="3">Finca El Alquián - Pepino Almería</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">¿Qué observas en las plantas? (Descripción de síntomas):</label>
+                <textarea id="description" rows="4"
+                    placeholder="Ej: Hay pequeñas moscas blancas flotando cuando muevo las hojas del tomate..."></textarea>
+            </div>
+
+            <button id="sendBtn" onclick="analyzeSymptom()">Enviar Reporte a Google AI</button>
+        </div>
+
+        <!-- Estado de Carga Simulado -->
+        <div id="loadingBox" class="card loading">
+            Procesando reporte con Google AI Pro... Analizando patrones de plagas...
+        </div>
+
+        <!-- Resultado de la IA (Contrato del JSON futuro) -->
+        <div id="resultCard" class="card result-card">
+            <h3>📋 Diagnóstico Generado</h3>
+            <p><strong>Plaga sospechosa:</strong> <span id="pestName"></span> (<span id="probability"></span>% de
+                coincidencia)</p>
+            <p><strong>Nivel de Alerta:</strong> <span class="badge" id="alertLevel"></span></p>
+            <hr style="border-color: var(--border);">
+            <p><strong>Tratamiento Recomendado (Control Integrado):</strong></p>
+            <p id="treatmentAdvice" class="treatment-text"></p>
+        </div>
+    </div>
+
+    <script>
+        function analyzeSymptom() {
+            const crop = document.getElementById('cropSelect').value;
+            const text = document.getElementById('description').value;
+
+            if (!crop || !text.trim()) {
+                alert('Por favor, selecciona un cultivo y describe lo que ves.');
+                return;
+            }
+
+            // Bloqueamos la interfaz simulando la espera de la API
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('loadingBox').style.display = 'block';
+            document.getElementById('resultCard').style.display = 'none';
+
+            // Simulamos la respuesta que nos enviará .NET en el futuro (El Contrato JSON)
+            // Todo el tipado técnico de datos viaja en inglés cumpliendo tu norma
+            const mockApiResponse = {
+                pestDetected: "Whitefly (Bemisia tabaci)",
+                confidencePercentage: 89,
+                urgencyLevel: "MEDIUM",
+                suggestedTreatment: "Aplicar jabón potásico combinado con aceite de neem en las horas de menor insolación. Introducir 'Amblyseius swirskii' como método de control biológico en el invernadero."
+            };
+
+            // Esperamos 2 segundos para simular latencia de red
+            setTimeout(() => {
+                // Ocultamos carga
+                document.getElementById('loadingBox').style.display = 'none';
+                document.getElementById('sendBtn').disabled = false;
+
+                // Pintamos los datos mapeando el JSON inglés a la pantalla en español
+                document.getElementById('pestName').innerText = "Mosca Blanca (Whitefly)";
+                document.getElementById('probability').innerText = mockApiResponse.confidencePercentage;
+                document.getElementById('alertLevel').innerText = mockApiResponse.urgencyLevel;
+                document.getElementById('treatmentAdvice').innerText = mockApiResponse.suggestedTreatment;
+
+                // Mostramos la tarjeta de resultado
+                document.getElementById('resultCard').style.display = 'block';
+            }, 2000);
+        }
+    </script>
+
+</body>
+
+</html>

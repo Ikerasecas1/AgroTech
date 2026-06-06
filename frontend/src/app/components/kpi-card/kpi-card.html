@@ -1,0 +1,16 @@
+<div class="kpi-card" [style.--kpi-accent]="accentColor()">
+  <div class="kpi-icon-wrapper">
+    <mat-icon class="kpi-icon">{{ icon() }}</mat-icon>
+  </div>
+
+  <div class="kpi-content">
+    <span class="kpi-title">{{ title() }}</span>
+    <span class="kpi-value">{{ value() }}</span>
+
+    @if (trend()) {
+      <span class="kpi-trend">{{ trend() }}</span>
+    }
+  </div>
+
+  <div class="kpi-glow"></div>
+</div>

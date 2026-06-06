@@ -1,0 +1,23 @@
+<nav class="sidebar-nav" aria-label="Navegación principal">
+  <div class="sidebar-section-label">MENÚ</div>
+
+  <mat-nav-list>
+    @for (item of navItems(); track item.route) {
+      <a mat-list-item
+         [routerLink]="item.route"
+         routerLinkActive="nav-active"
+         class="nav-item"
+         [id]="'nav-' + item.route.slice(1)">
+        <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span matListItemTitle class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </mat-nav-list>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-version">
+      <mat-icon class="version-icon">info_outline</mat-icon>
+      <span>v0.1.0 · Beta</span>
+    </div>
+  </div>
+</nav>

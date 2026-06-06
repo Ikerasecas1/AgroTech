@@ -1,0 +1,178 @@
+<div class="users-page">
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    @for (kpi of kpiData(); track kpi.title) {
+      <app-kpi-card
+        [title]="kpi.title"
+        [value]="kpi.value"
+        [icon]="kpi.icon"
+        [trend]="kpi.trend ?? ''"
+        [accentColor]="kpi.accentColor ?? ''">
+      </app-kpi-card>
+    }
+  </div>
+
+  <!-- Role Filter Chips -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-title-group">
+        <mat-icon class="section-icon">filter_list</mat-icon>
+        <h2 class="section-title">Filtrar por Rol</h2>
+      </div>
+    </div>
+    <div class="role-filters">
+      <button class="role-chip"
+              [class.active]="selectedRoleFilter() === 'all'"
+              (click)="setRoleFilter('all')">
+        <mat-icon class="chip-icon">people</mat-icon>
+        Todos
+      </button>
+      <button class="role-chip"
+              [class.active]="selectedRoleFilter() === 'Admin'"
+              [style.--chip-color]="roleColors['Admin']"
+              (click)="setRoleFilter('Admin')">
+        <mat-icon class="chip-icon">admin_panel_settings</mat-icon>
+        Administradores
+      </button>
+      <button class="role-chip"
+              [class.active]="selectedRoleFilter() === 'Technician'"
+              [style.--chip-color]="roleColors['Technician']"
+              (click)="setRoleFilter('Technician')">
+        <mat-icon class="chip-icon">biotech</mat-icon>
+        Técnicos
+      </button>
+      <button class="role-chip"
+              [class.active]="selectedRoleFilter() === 'Foreman'"
+              [style.--chip-color]="roleColors['Foreman']"
+              (click)="setRoleFilter('Foreman')">
+        <mat-icon class="chip-icon">supervisor_account</mat-icon>
+        Encargados
+      </button>
+      <button class="role-chip"
+              [class.active]="selectedRoleFilter() === 'Worker'"
+              [style.--chip-color]="roleColors['Worker']"
+              (click)="setRoleFilter('Worker')">
+        <mat-icon class="chip-icon">badge</mat-icon>
+        Jornaleros
+      </button>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-title-group">
+        <mat-icon class="section-icon">people</mat-icon>
+        <h2 class="section-title">Usuarios del Sistema</h2>
+        <span class="section-count">{{ filteredUsers().length }} usuarios</span>
+      </div>
+      <button mat-icon-button matTooltip="Añadir usuario" class="add-btn" id="btn-add-user">
+        <mat-icon>person_add</mat-icon>
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table" id="users-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Jornalero Vinculado</th>
+            <th>Último Acceso</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filteredUsers(); track user.id) {
+            <tr class="table-row" [class.inactive-row]="!user.isActive">
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" [style.background]="roleColors[user.role]">
+                    {{ getInitials(user.firstName, user.lastName) }}
+                  </div>
+                  <div class="user-info">
+                    <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+                    <span class="user-username">&#64;{{ user.username }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="email-text">{{ user.email }}</span>
+              </td>
+              <td>
+                <div class="role-badge" [style.--role-color]="roleColors[user.role]">
+                  <mat-icon class="role-badge-icon">{{ roleIcons[user.role] }}</mat-icon>
+                  {{ roleLabels[user.role] }}
+                </div>
+              </td>
+              <td>
+                @if (user.linkedWorker) {
+                  <div class="linked-worker">
+                    <mat-icon class="link-icon">link</mat-icon>
+                    {{ user.linkedWorker }}
+                  </div>
+                } @else {
+                  <span class="no-link">—</span>
+                }
+              </td>
+              <td>
+                @if (user.lastLogin) {
+                  <span class="last-login">{{ user.lastLogin }}</span>
+                } @else {
+                  <span class="no-link">Nunca</span>
+                }
+              </td>
+              <td>
+                <div class="status-badge" [class.status-active]="user.isActive" [class.status-inactive]="!user.isActive">
+                  <span class="status-dot"></span>
+                  {{ user.isActive ? 'Activo' : 'Inactivo' }}
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Roles & Permissions Info -->
+  <div class="section-card roles-info-card">
+    <div class="section-header">
+      <div class="section-title-group">
+        <mat-icon class="section-icon">security</mat-icon>
+        <h2 class="section-title">Roles y Permisos</h2>
+      </div>
+    </div>
+    <div class="roles-grid">
+      <div class="role-info-item">
+        <div class="role-info-header" style="--role-accent: #ef4444">
+          <mat-icon>admin_panel_settings</mat-icon>
+          <span>Administrador</span>
+        </div>
+        <p class="role-info-desc">Acceso completo: Dashboard, Sectores, Incidencias, Tratamientos, Cuadrillas y Usuarios.</p>
+      </div>
+      <div class="role-info-item">
+        <div class="role-info-header" style="--role-accent: var(--ag-info)">
+          <mat-icon>biotech</mat-icon>
+          <span>Técnico</span>
+        </div>
+        <p class="role-info-desc">Dashboard, Sectores y Cultivos, Incidencias con IA, Tratamientos Fitosanitarios.</p>
+      </div>
+      <div class="role-info-item">
+        <div class="role-info-header" style="--role-accent: #8b5cf6">
+          <mat-icon>supervisor_account</mat-icon>
+          <span>Encargado</span>
+        </div>
+        <p class="role-info-desc">Dashboard limitado, gestión de su cuadrilla, fichajes y producción de su equipo.</p>
+      </div>
+      <div class="role-info-item">
+        <div class="role-info-header" style="--role-accent: var(--ag-green-500)">
+          <mat-icon>badge</mat-icon>
+          <span>Jornalero</span>
+        </div>
+        <p class="role-info-desc">Perfil personal, sus fichajes horarios y su producción individual al destajo.</p>
+      </div>
+    </div>
+  </div>
+</div>

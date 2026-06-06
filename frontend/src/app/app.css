@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--ag-bg-primary);
+}
+
+.app-sidenav-container {
+  height: calc(100vh - 64px);
+  margin-top: 64px;
+  background: var(--ag-bg-primary) !important;
+}
+
+.app-sidenav {
+  width: 260px;
+  background: var(--ag-bg-secondary) !important;
+  border-right: 1px solid var(--ag-border) !important;
+}
+
+.app-content {
+  background: var(--ag-bg-primary) !important;
+  overflow-y: auto;
+}

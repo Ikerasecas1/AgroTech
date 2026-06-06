@@ -1,0 +1,90 @@
+<div class="mobile-wrapper">
+  <!-- Status Bar (Decorativo) -->
+  <div class="status-bar">
+    <div class="time">{{ currentTime() }}</div>
+    <div class="icons">
+      <mat-icon>wifi</mat-icon>
+      <mat-icon>battery_full</mat-icon>
+    </div>
+  </div>
+
+  <div class="attendance-container">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <h1 class="title">Fichaje Seguro</h1>
+      <p class="subtitle">Apunta con la cámara al código QR de tu centro de trabajo.</p>
+    </header>
+
+    <!-- Permisos Status -->
+    <div class="permissions-tray">
+      <div class="perm-badge" [ngClass]="cameraPermission()">
+        <mat-icon>{{ cameraPermission() === 'granted' ? 'videocam' : 'videocam_off' }}</mat-icon>
+        <span>Cámara</span>
+      </div>
+      <div class="perm-badge" [ngClass]="gpsPermission()">
+        <mat-icon>{{ gpsPermission() === 'granted' ? 'location_on' : 'location_off' }}</mat-icon>
+        <span>GPS Location</span>
+      </div>
+    </div>
+
+    <!-- Visor del Escáner (Simulado) -->
+    <div class="scanner-section">
+      <div class="scanner-frame" [class.scanning]="isScanning()">
+        <!-- Esquinas del escáner -->
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+
+        <!-- Láser animado -->
+        @if (isScanning()) {
+          <div class="laser"></div>
+          <div class="scanner-hint">
+            Buscando QR...
+          </div>
+        }
+
+        <!-- Overlay de Feedback -->
+        @if (feedbackStatus() !== 'idle') {
+          <div class="feedback-overlay" [ngClass]="feedbackStatus()">
+            @if (feedbackStatus() === 'processing') {
+              <mat-spinner diameter="40" color="accent"></mat-spinner>
+            }
+            @if (feedbackStatus() === 'success') {
+              <div class="success-circle">
+                <mat-icon>check_circle</mat-icon>
+              </div>
+            }
+            @if (feedbackStatus() === 'error') {
+              <div class="error-circle">
+                <mat-icon>error</mat-icon>
+              </div>
+            }
+            <span class="feedback-text">{{ feedbackMessage() }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Panel de Simulador de Desarrollo (Solo visual para ver los flujos) -->
+    <div class="simulator-panel">
+      <div class="sim-header">
+        <mat-icon>bug_report</mat-icon>
+        <span>Simulador de Estados (Dev Only)</span>
+      </div>
+      <div class="sim-buttons">
+        <button mat-flat-button color="primary" class="sim-btn" (click)="simulateValidScan('static')" [disabled]="feedbackStatus() !== 'idle'">
+          <mat-icon>qr_code_2</mat-icon> Escanear QR Estático (Sede)
+        </button>
+        <button mat-flat-button color="accent" class="sim-btn" (click)="simulateValidScan('dynamic')" [disabled]="feedbackStatus() !== 'idle'">
+          <mat-icon>qr_code_scanner</mat-icon> Escanear QR Dinámico (Jefe)
+        </button>
+        <button mat-stroked-button class="sim-btn fake-gps" (click)="simulateFakeGps()" [disabled]="feedbackStatus() !== 'idle'">
+          <mat-icon>gps_off</mat-icon> Simular Fake GPS (Fuera de Rango)
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
